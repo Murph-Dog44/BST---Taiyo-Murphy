@@ -11,7 +11,6 @@ public class Main{
         tree.insert(60);
         tree.insert(80);
 
-        // print inorder traversal of the BST
         // System.out.println(tree.search(25));
         // System.out.println(tree.search(70));
 
@@ -22,9 +21,10 @@ public class Main{
         // System.out.println(tree.search(20));
 
         tree.remove(50);
-        System.out.println(tree.search(50));
-        System.out.println(tree.search(30));
-        System.out.println(tree.search(70));
+        // System.out.println(tree.search(50));
+        // System.out.println(tree.search(30));
+        // System.out.println(tree.search(70));
+        System.out.println(tree);
     }
 
 }

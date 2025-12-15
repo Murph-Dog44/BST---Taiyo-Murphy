@@ -1,3 +1,8 @@
+<<<<<<< master
+import java.util.ArrayList;
+
+=======
+>>>>>>> codespace-cautious-space-potato-x5qqr9pq55jw36979
 class BST {
 
     Node root;
@@ -81,14 +86,15 @@ class BST {
             }
             //two children
             else{
-                int replacementKey = root.right.key;
+                
                 Node replacementNode = root.right;
                 Node replacementParent = root;
                 while(replacementNode.left != null) {
                     replacementParent = replacementNode;
                     replacementNode = replacementNode.left;
                 }
-                root.key = replacementKey;
+                
+                root.key = replacementNode.key;
                 if (replacementParent == root) {
                     root.right = replacementNode.right;
                 } else {
@@ -124,13 +130,13 @@ class BST {
                 }
                 //two child
                 else{
-                    int replacementKey = keyNode.right.key;
                     Node replacementNode = keyNode.right;
                     Node replacementParent = keyNode;
                     while(replacementNode.left != null) {
                         replacementParent = replacementNode;
                         replacementNode = replacementNode.left;
                     }
+                    int replacementKey = keyNode.right.key;
                     prev.left.key = replacementKey;
                     if (replacementParent == keyNode) {
                         // replacementNode is the right of keyNode
@@ -157,13 +163,13 @@ class BST {
                 }
                 //two child
                 else{
-                    int replacementKey = keyNode.right.key;
                     Node replacementNode = keyNode.right;
                     Node replacementParent = keyNode;
                     while(replacementNode.left != null) {
                         replacementParent = replacementNode;
                         replacementNode = replacementNode.left;
                     }
+                    int replacementKey = keyNode.right.key;
                     prev.right.key = replacementKey;
                     if (replacementParent == keyNode) {
                         // replacementNode is right child
@@ -179,8 +185,145 @@ class BST {
 
     }
 
-    // public String toString(){
-        
-    // }
+    public String toString(){
+        if (root == null) return "";
+        ArrayList<ArrayList<Integer>> levels = new ArrayList<>();
+        toString(root, 0, levels);
 
+        String s = "";
+        for (int i = 0; i < levels.size(); i++) {
+            ArrayList<Integer> lvl = levels.get(i);
+            for (int j = 0; j < lvl.size(); j++) {
+                if (j > 0) s += " ";
+                s += lvl.get(j);
+            }
+            if (i < levels.size() - 1) s += "\n";
+        }
+        return s;
+    }
+
+    private void toString(Node node, int level, ArrayList<ArrayList<Integer>> levels) {
+        if (node == null) return;
+        toString(node.left, level + 1, levels);
+        while (levels.size() <= level) {
+            levels.add(new ArrayList<Integer>());
+        }
+        levels.get(level).add(node.key);
+        toString(node.right, level + 1, levels);
+    }
+
+
+
+
+
+
+    //Add the following functions to your BST
+ //Please use this code to verify your tree integrity
+    public boolean isBSTOrNot() {
+        return isBSTOrNot(this.root, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    private boolean isBSTOrNot(Node root, int minValue, int maxValue) {
+        // check for root is not null or not
+        if (root == null) {
+            return true;
+        }
+        // check for current node value with left node value and right node value and recursively check for left sub tree and right sub tree
+        if(root.key >= minValue && root.key <= maxValue && isBSTOrNot(root.left, minValue, root.key) && isBSTOrNot(root.right, root.key, maxValue)){
+            return true;
+        }
+        return false;
+    }
+
+ 
+
+   // please use the following pieces of code to display your tree in a more easy to follow style (Note* you'll need to place the Trunk class in it's own file)
+    public static void showTrunks(Trunk p)
+    {
+        if (p == null) {
+            return;
+        }
+ 
+        showTrunks(p.prev);
+        System.out.print(p.str);
+    }
+ 
+    public void printTree(){
+        printTree(root, null, false);
+    }
+
+    private void printTree(Node root, Trunk prev, boolean isLeft)
+    {
+        if (root == null) {
+            return;
+        }
+ 
+        String prev_str = "    ";
+        Trunk trunk = new Trunk(prev, prev_str);
+ 
+        printTree(root.right, trunk, true);
+ 
+        if (prev == null) {
+            trunk.str = "———";
+        }
+        else if (isLeft) {
+            trunk.str = ".———";
+            prev_str = "   |";
+        }
+        else {
+            trunk.str = "`———";
+            prev.str = prev_str;
+        }
+ 
+        showTrunks(trunk);
+        System.out.println(" " + root.key);
+ 
+        if (prev != null) {
+            prev.str = prev_str;
+        }
+        trunk.str = "   |";
+ 
+        printTree(root.left, trunk, false);
+    }
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////Rotation/////////////////////////////////////
+
+    private void rotateRight(Node subRoot, Node prev){
+        boolean left = false;
+        if (prev.left.key == subRoot.key){
+            left = true;
+        }
+        Node pivot = subRoot.left;
+        if (pivot.right != null){
+            subRoot.left = pivot.right;
+        }
+        pivot.right = subRoot;
+        if (left){
+            prev.left = pivot;
+        } else {
+            prev.right = pivot;
+        }
+        
+    }
+
+    private void rotateLeft(Node subRoot, Node prev){
+        boolean left = false;
+        if (prev.left.key == subRoot.key){
+            left = true;
+        }
+        Node pivot = subRoot.right;
+        if (pivot.left != null){
+            subRoot.right = pivot.left;
+        }
+        pivot.left = subRoot;
+        if (left){
+            prev.left = pivot;
+        } else {
+            prev.right = pivot;
+        }
+    }
 }
