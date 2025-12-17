@@ -25,6 +25,7 @@ public class Main{
         // System.out.println(tree.search(30));
         // System.out.println(tree.search(70));
         System.out.println(tree);
+        System.out.println("" + tree.height());
     }
 
 }

@@ -4,6 +4,8 @@ class BST {
 
     Node root;
 
+    // Precondition: None.
+    // Postcondition: Initializes an empty BST (root == null).
     public BST()
     {
         root = null;
@@ -17,6 +19,8 @@ class BST {
         insert(key, root);
     }
     
+    // Precondition: BST is properly initialized. 'prev' is the current node (may be null if tree empty).
+    // Postcondition: Inserts 'key' into the subtree rooted at 'prev' (or sets root if prev is null). Duplicates are ignored.
     private void insert(int key, Node prev){
         //empty tree case
         if (prev == null){
@@ -54,6 +58,8 @@ class BST {
 
     }
 
+    // Precondition: BST is properly initialized; 'myNode' is the current subtree root (may be null).
+    // Postcondition: Returns true if 'key' exists in subtree rooted at 'myNode', false otherwise.
     private boolean search(int key, Node myNode){
         if (myNode == null) return false;
         if (myNode.key == key) return true;
@@ -182,6 +188,8 @@ class BST {
 
     }
 
+    // Precondition: BST is properly initialized.
+    // Postcondition: Returns a string with each tree depth on its own line, nodes at each depth left-to-right.
     public String toString(){
         if (root == null) return "";
         ArrayList<ArrayList<Integer>> levels = new ArrayList<>();
@@ -199,6 +207,8 @@ class BST {
         return s;
     }
 
+    // Precondition: 'levels' is an ArrayList where index corresponds to depth level.
+    // Postcondition: Appends node keys into 'levels' at their respective depth using in-order traversal.
     private void toString(Node node, int level, ArrayList<ArrayList<Integer>> levels) {
         if (node == null) return;
         toString(node.left, level + 1, levels);
@@ -216,10 +226,14 @@ class BST {
 
     //Add the following functions to your BST
  //Please use this code to verify your tree integrity
+    // Precondition: BST is properly initialized.
+    // Postcondition: Returns true if tree satisfies the BST ordering property for all nodes.
     public boolean isBSTOrNot() {
         return isBSTOrNot(this.root, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    // Precondition: 'root' is current node; all keys in this subtree must be within [minValue, maxValue].
+    // Postcondition: Returns true if subtree rooted at 'root' satisfies BST property within the given bounds.
     private boolean isBSTOrNot(Node root, int minValue, int maxValue) {
         // check for root is not null or not
         if (root == null) {
@@ -245,10 +259,14 @@ class BST {
         System.out.print(p.str);
     }
  
+    // Precondition: BST is properly initialized.
+    // Postcondition: Prints a formatted ASCII representation of the tree to stdout.
     public void printTree(){
         printTree(root, null, false);
     }
 
+    // Precondition: 'root' is current node; 'prev' is the chain of trunks from parent (may be null).
+    // Postcondition: Prints the subtree rooted at 'root' using ASCII trunk formatting.
     private void printTree(Node root, Trunk prev, boolean isLeft)
     {
         if (root == null) {
@@ -289,6 +307,8 @@ class BST {
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////Rotation/////////////////////////////////////
 
+    // Precondition: 'prev' is the parent of 'subRoot' and not null; subRoot.left != null.
+    // Postcondition: Performs an in-place right rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateRight(Node subRoot, Node prev){
         boolean left = false;
         if (prev.left.key == subRoot.key){
@@ -307,6 +327,8 @@ class BST {
         
     }
 
+    // Precondition: 'prev' is the parent of 'subRoot' and not null; subRoot.right != null.
+    // Postcondition: Performs an in-place left rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateLeft(Node subRoot, Node prev){
         boolean left = false;
         if (prev.left.key == subRoot.key){
@@ -323,4 +345,32 @@ class BST {
             prev.right = pivot;
         }
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////Height & Balance/////////////////////////////////
+    
+    // Precondition: BST is properly initialized.
+    // Postcondition: Returns the height of the tree (empty tree -> -1, single node -> 0).
+    public int height(){
+        return height(root);
+    }
+
+    // Precondition: 'node' is root of subtree (may be null).
+    // Postcondition: Returns height of subtree, or -1 if null.
+    private int height(Node node){
+        if (node == null) return -1;
+        if (node.left == null && node.right == null) return 0;
+        if (node.left == null && node.right != null) return height(node.right)+1;
+        if (node.left != null && node.right == null) return height(node.left)+1;
+        return Math.max(height(node.left)+1, height(node.right)+1);
+    }
+
+    // Precondition: 'node' is root of subtree (may be null).
+    // Postcondition: Returns balance factor = height(left) - height(right); returns 0 if node is null.
+    private int balance(Node node){
+        if (node == null) return 0;
+        return height(node.left) - height(node.right);
+    }
+
 }
