@@ -107,80 +107,69 @@ class BST {
         }
         //not root cases
         else {
-            Boolean x = true;
-            while (x){
-                if (prev.left.key == key || prev.right.key == key){
-                    x = false;
-                } else if (key > prev.key){
-                    prev = prev.right;
-                } else{
-                    prev = prev.left;
-                }
-            }
-
-            if (prev.left.key == key){
-                Node keyNode = prev.left;
-                //no child
-                if (prev.left.left == null && prev.left.right == null){
-                    prev.left = null;
-                }
-                //one child
-                else if (prev.left.left != null && prev.left.right == null){
-                    prev.left = prev.left.left;
-                }
-                else if (prev.left.left == null && prev.left.right != null){
-                    prev.left = prev.left.right;
-                }
-                //two child
-                else{
-                    Node replacementNode = keyNode.right;
-                    Node replacementParent = keyNode;
-                    while(replacementNode.left != null) {
-                        replacementParent = replacementNode;
-                        replacementNode = replacementNode.left;
+            // traverse until find a parent w left/right child has key
+            while (prev != null) {
+                if (prev.left != null && prev.left.key == key) {
+                    Node keyNode = prev.left;
+                    //no child
+                    if (keyNode.left == null && keyNode.right == null){
+                        prev.left = null;
                     }
-                    int replacementKey = keyNode.right.key;
-                    prev.left.key = replacementKey;
-                    if (replacementParent == keyNode) {
-                        // replacementNode is the right of keyNode
-                        prev.left.right = replacementNode.right;
-                    } else {
-                        // replacementNode is in the left of keyNode's right
-                        replacementParent.left = replacementNode.right;
+                    //one child
+                    else if (keyNode.left != null && keyNode.right == null){
+                        prev.left = keyNode.left;
                     }
-                }
-
-            }
-            if (prev.right.key == key){
-                Node keyNode = prev.right;
-                //no child
-                if (prev.right.left == null && prev.right.right == null){
-                    prev.right = null;
-                }
-                //one child
-                else if (prev.right.left != null && prev.right.right == null){
-                    prev.right = prev.right.left;
-                }
-                else if (prev.right.left == null && prev.right.right != null){
-                    prev.right = prev.right.right;
-                }
-                //two child
-                else{
-                    Node replacementNode = keyNode.right;
-                    Node replacementParent = keyNode;
-                    while(replacementNode.left != null) {
-                        replacementParent = replacementNode;
-                        replacementNode = replacementNode.left;
+                    else if (keyNode.left == null && keyNode.right != null){
+                        prev.left = keyNode.right;
                     }
-                    int replacementKey = keyNode.right.key;
-                    prev.right.key = replacementKey;
-                    if (replacementParent == keyNode) {
-                        // replacementNode is right child
-                        prev.right.right = replacementNode.right;
-                    } else {
-                        // replacementNode is left of keyNode's right
-                        replacementParent.left = replacementNode.right;
+                    //two child
+                    else{
+                        Node replacementNode = keyNode.right;
+                        Node replacementParent = keyNode;
+                        while(replacementNode.left != null) {
+                            replacementParent = replacementNode;
+                            replacementNode = replacementNode.left;
+                        }
+                        prev.left.key = replacementNode.key;
+                        if (replacementParent == keyNode) {
+                            prev.left.right = replacementNode.right;
+                        } else {
+                            replacementParent.left = replacementNode.right;
+                        }
                     }
+                    return true;
+                } else if (prev.right != null && prev.right.key == key) {
+                    Node keyNode = prev.right;
+                    //no child
+                    if (keyNode.left == null && keyNode.right == null){
+                        prev.right = null;
+                    }
+                    //one child
+                    else if (keyNode.left != null && keyNode.right == null){
+                        prev.right = keyNode.left;
+                    }
+                    else if (keyNode.left == null && keyNode.right != null){
+                        prev.right = keyNode.right;
+                    }
+                    //two child
+                    else{
+                        Node replacementNode = keyNode.right;
+                        Node replacementParent = keyNode;
+                        while(replacementNode.left != null) {
+                            replacementParent = replacementNode;
+                            replacementNode = replacementNode.left;
+                        }
+                        prev.right.key = replacementNode.key;
+                        if (replacementParent == keyNode) {
+                            prev.right.right = replacementNode.right;
+                        } else {
+                            replacementParent.left = replacementNode.right;
+                        }
+                    }
+                    return true;
+                } else {
+                    if (key > prev.key) prev = prev.right;
+                    else prev = prev.left;
                 }
             }
         }
@@ -310,34 +299,27 @@ class BST {
     // Precondition: 'prev' is the parent of 'subRoot' and not null; subRoot.left != null.
     // Postcondition: Performs an in-place right rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateRight(Node subRoot, Node prev){
-        boolean left = false;
-        if (prev.left.key == subRoot.key){
-            left = true;
-        }
+        boolean left = (prev.left != null && prev.left.key == subRoot.key);
         Node pivot = subRoot.left;
-        if (pivot.right != null){
-            subRoot.left = pivot.right;
-        }
+
+        subRoot.left = pivot.right;
+        
         pivot.right = subRoot;
         if (left){
             prev.left = pivot;
         } else {
             prev.right = pivot;
         }
-        
     }
 
     // Precondition: 'prev' is the parent of 'subRoot' and not null; subRoot.right != null.
     // Postcondition: Performs an in-place left rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateLeft(Node subRoot, Node prev){
-        boolean left = false;
-        if (prev.left.key == subRoot.key){
-            left = true;
-        }
+        boolean left = (prev.left != null && prev.left.key == subRoot.key);
         Node pivot = subRoot.right;
-        if (pivot.left != null){
-            subRoot.right = pivot.left;
-        }
+
+        subRoot.right = pivot.left;
+        
         pivot.left = subRoot;
         if (left){
             prev.left = pivot;
@@ -372,5 +354,29 @@ class BST {
         if (node == null) return 0;
         return height(node.left) - height(node.right);
     }
+
+    //balance the nodes under the selected node.
+    private void balanceTree(Node node, Node prev){
+        if (node == null) return;
+        //LL
+        else if (balance(node) > 1 && balance(node.left) >= 0) {
+            rotateRight(node, prev);
+        } 
+        //LR (double rotation)
+        else if (balance(node) < -1 && balance(node.left) < 0) {
+            rotateLeft(node.right, node);
+            rotateRight(node, prev);
+        }
+        //RR
+        else if (balance(node) > 1 && balance(node.right) >=0) {
+            rotateLeft(node, prev);
+        } 
+        //RL (double rotation)
+        else if (balance(node) < -1 && balance(node.right) < 0) {
+            rotateRight(node.left, node);
+            rotateLeft(node, prev);
+        }
+        return;
+    }  
 
 }
