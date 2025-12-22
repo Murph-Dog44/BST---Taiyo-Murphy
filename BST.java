@@ -292,13 +292,19 @@ class BST {
 
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////Rotation/////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////Rotation/////////////////////////////////////
+
 
     // Precondition: 'prev' is the parent of 'subRoot' and not null; subRoot.left != null.
     // Postcondition: Performs an in-place right rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateRight(Node subRoot, Node prev){
+        if (prev == null){
+            root = subRoot.left;
+            subRoot.left = root.right;
+            root.right = subRoot;
+        }
         boolean left = (prev.left != null && prev.left.key == subRoot.key);
         Node pivot = subRoot.left;
 
@@ -315,6 +321,11 @@ class BST {
     // Precondition: 'prev' is the parent of 'subRoot' and not null; subRoot.right != null.
     // Postcondition: Performs an in-place left rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateLeft(Node subRoot, Node prev){
+        if (prev == null){
+            root = subRoot.right;
+            subRoot.right = root.left;
+            root.left = subRoot;
+        }
         boolean left = (prev.left != null && prev.left.key == subRoot.key);
         Node pivot = subRoot.right;
 
@@ -329,9 +340,12 @@ class BST {
     }
 
 
+
     ////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////Height & Balance/////////////////////////////////
     
+
+
     // Precondition: BST is properly initialized.
     // Postcondition: Returns the height of the tree (empty tree -> -1, single node -> 0).
     public int height(){
@@ -377,6 +391,42 @@ class BST {
             rotateLeft(node, prev);
         }
         return;
-    }  
+    }
 
+    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////AVL Stuff///////////////////////////////////////
+
+    void AVLinsert(int key){
+        AVLinsert(key, root);
+    }
+    
+    // Precondition: BST is properly initialized. 'prev' is the current node (may be null if tree empty).
+    // Postcondition: Inserts 'key' into the subtree rooted at 'prev' (or sets root if prev is null). Duplicates are ignored.
+    private void AVLinsert(int key, Node prev){
+        //empty tree case
+        if (prev == null){
+            root = new Node(key);
+            return;
+        }
+        // key is bigger than prev (right)
+        if (key > prev.key){
+            if (prev.right == null){
+                prev.right = new Node(key);
+                return;
+            }
+            else {
+                insert(key, prev.right);
+            }
+        }
+        // key is smaller than prev (left)
+        if (key <= prev.key){
+            if (prev.left == null){
+                prev.left = new Node(key);
+                return;
+            }
+            else {
+                insert(key, prev.left);
+            }
+        }
+    }
 }
