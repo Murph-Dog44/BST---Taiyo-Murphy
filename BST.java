@@ -4,6 +4,7 @@ class BST {
 
     Node root;
 
+
     // Precondition: None.
     // Postcondition: Initializes an empty BST (root == null).
     public BST()
@@ -377,14 +378,14 @@ class BST {
             rotateRight(node, prev);
         } 
         //LR (double rotation)
-        else if (balance(node) < -1 && balance(node.left) < 0) {
+        else if (balance(node) > 1 && balance(node.left) < 0) {
             rotateLeft(node.right, node);
             rotateRight(node, prev);
         }
         //RR
-        else if (balance(node) > 1 && balance(node.right) >=0) {
+        else if (balance(node) < -1 && balance(node.right) >=0) {
             rotateLeft(node, prev);
-        } 
+        }
         //RL (double rotation)
         else if (balance(node) < -1 && balance(node.right) < 0) {
             rotateRight(node.left, node);
@@ -397,36 +398,172 @@ class BST {
     /////////////////////////////////////AVL Stuff///////////////////////////////////////
 
     void AVLinsert(int key){
-        AVLinsert(key, root);
+        ArrayList<Node> nodes = new ArrayList<>();
+        AVLinsert(key, root, nodes);
+        for (int i = nodes.size()-1; i>0; i--){
+            balanceTree(nodes.get(i), nodes.get(i-1));
+        }
     }
     
     // Precondition: BST is properly initialized. 'prev' is the current node (may be null if tree empty).
     // Postcondition: Inserts 'key' into the subtree rooted at 'prev' (or sets root if prev is null). Duplicates are ignored.
-    private void AVLinsert(int key, Node prev){
+
+    // as it recurses, add whichever node its on to the arraylist of nodes. 
+
+    private void AVLinsert(int key, Node prev, ArrayList<Node> nodes){
         //empty tree case
         if (prev == null){
             root = new Node(key);
             return;
         }
+        nodes.add(prev);
         // key is bigger than prev (right)
         if (key > prev.key){
             if (prev.right == null){
                 prev.right = new Node(key);
+                nodes.add(prev.right);
                 return;
             }
             else {
-                insert(key, prev.right);
+
+                AVLinsert(key, prev.right, nodes);
             }
         }
         // key is smaller than prev (left)
         if (key <= prev.key){
             if (prev.left == null){
                 prev.left = new Node(key);
+                nodes.add(prev.left);
                 return;
             }
             else {
-                insert(key, prev.left);
+                AVLinsert(key, prev.left, nodes);
             }
         }
     }
+
+    void AVLremove(int key){
+        ArrayList<Node> nodes = new ArrayList<>();
+        AVLremove(key, nodes);
+        for (int i = nodes.size()-1; i>0; i--){
+            balanceTree(nodes.get(i), nodes.get(i-1));
+        }
+    }
+
+    private boolean AVLremove(int key, ArrayList<Node> nodes){
+        Node prev = root;
+        if (!search(key)) return false;
+        nodes.add(prev);
+        //root case
+        if (root.key == key){
+            //no child
+            if (root.left == null && root.right == null){
+                root = null;
+            }
+            //one child
+            else if (root.left != null && root.right == null){
+                root = root.left;
+            }
+            else if (root.left == null && root.right != null){
+                root = root.right;
+            }
+            //two children
+            else{
+                Node replacementNode = root.right;
+                
+                Node replacementParent = root;
+                while(replacementNode.left != null) {
+                    replacementParent = replacementNode;
+                    nodes.add(replacementParent);
+                    replacementNode = replacementNode.left;
+                }
+                
+                root.key = replacementNode.key;
+                if (replacementParent == root) {
+                    root.right = replacementNode.right;
+                } else {
+                    replacementParent.left = replacementNode.right;
+                }
+            }
+        }
+        //not root cases
+        else {
+            // traverse until find a parent w left/right child has key
+            while (prev != null) {
+                if (prev.left != null && prev.left.key == key) {
+                    Node keyNode = prev.left;
+                    //no child
+                    if (keyNode.left == null && keyNode.right == null){
+                        prev.left = null;
+                    }
+                    //one child
+                    else if (keyNode.left != null && keyNode.right == null){
+                        prev.left = keyNode.left;
+                    }
+                    else if (keyNode.left == null && keyNode.right != null){
+                        prev.left = keyNode.right;
+                    }
+                    //two child
+                    else{
+                        Node replacementNode = keyNode.right;
+                        Node replacementParent = keyNode;
+                        while(replacementNode.left != null) {
+                            replacementParent = replacementNode;
+                            nodes.add(replacementParent);
+                            replacementNode = replacementNode.left;
+                        }
+                        prev.left.key = replacementNode.key;
+                        if (replacementParent == keyNode) {
+                            prev.left.right = replacementNode.right;
+                        } else {
+                            replacementParent.left = replacementNode.right;
+                        }
+                    }
+                    return true;
+                } else if (prev.right != null && prev.right.key == key) {
+                    Node keyNode = prev.right;
+                    //no child
+                    if (keyNode.left == null && keyNode.right == null){
+                        prev.right = null;
+                    }
+                    //one child
+                    else if (keyNode.left != null && keyNode.right == null){
+                        prev.right = keyNode.left;
+                    }
+                    else if (keyNode.left == null && keyNode.right != null){
+                        prev.right = keyNode.right;
+                    }
+                    //two child
+                    else{
+                        Node replacementNode = keyNode.right;
+                        Node replacementParent = keyNode;
+                        while(replacementNode.left != null) {
+                            replacementParent = replacementNode;
+                            nodes.add(replacementParent);
+                            replacementNode = replacementNode.left;
+                        }
+                        prev.right.key = replacementNode.key;
+                        if (replacementParent == keyNode) {
+                            prev.right.right = replacementNode.right;
+                        } else {
+                            replacementParent.left = replacementNode.right;
+                        }
+                    }
+                    return true;
+                } else {
+                    if (key > prev.key) {
+                        prev = prev.right;
+                        nodes.add(prev);
+                    }
+                    else {
+                        prev = prev.left;
+                        nodes.add(prev);
+                    }
+                }
+            }
+        }
+        return true;
+
+    }
+
 }
