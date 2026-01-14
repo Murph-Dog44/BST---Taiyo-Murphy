@@ -302,9 +302,11 @@ class BST {
     // Postcondition: Performs an in-place right rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateRight(Node subRoot, Node prev){
         if (prev == null){
-            root = subRoot.left;
-            subRoot.left = root.right;
+            Node pivot = subRoot.left;
+            root = pivot;
+            subRoot.left = pivot.right;
             root.right = subRoot;
+            return;
         }
         boolean left = (prev.left != null && prev.left.key == subRoot.key);
         Node pivot = subRoot.left;
@@ -323,9 +325,11 @@ class BST {
     // Postcondition: Performs an in-place left rotation at 'subRoot' and updates the parent's child pointer.
     private void rotateLeft(Node subRoot, Node prev){
         if (prev == null){
-            root = subRoot.right;
-            subRoot.right = root.left;
+            Node pivot = subRoot.right;
+            root = pivot;
+            subRoot.right = pivot.left;
             root.left = subRoot;
+            return;
         }
         boolean left = (prev.left != null && prev.left.key == subRoot.key);
         Node pivot = subRoot.right;
@@ -374,24 +378,23 @@ class BST {
     private void balanceTree(Node node, Node prev){
         if (node == null) return;
         //LL
-        else if (balance(node) > 1 && balance(node.left) >= 0) {
+        if (balance(node) > 1 && balance(node.left) >= 0) {
             rotateRight(node, prev);
         } 
         //LR (double rotation)
         else if (balance(node) > 1 && balance(node.left) < 0) {
-            rotateLeft(node.right, node);
+            rotateLeft(node.left, node);
             rotateRight(node, prev);
         }
         //RR
-        else if (balance(node) < -1 && balance(node.right) >=0) {
+        else if (balance(node) < -1 && balance(node.right) <= 0) {  // Changed >= to <=
             rotateLeft(node, prev);
         }
         //RL (double rotation)
-        else if (balance(node) < -1 && balance(node.right) < 0) {
-            rotateRight(node.left, node);
+        else if (balance(node) < -1 && balance(node.right) > 0) {  // Changed < to >
+            rotateRight(node.right, node);
             rotateLeft(node, prev);
         }
-        return;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
@@ -400,8 +403,14 @@ class BST {
     void AVLinsert(int key){
         ArrayList<Node> nodes = new ArrayList<>();
         AVLinsert(key, root, nodes);
-        for (int i = nodes.size()-1; i>0; i--){
-            balanceTree(nodes.get(i), nodes.get(i-1));
+        for (int i = nodes.size()-1; i>=0; i--){
+            Node parent;
+            if (i>0){
+                parent = nodes.get(i-1);
+            } else {
+                parent = null;
+            }
+            balanceTree(nodes.get(i), parent);
         }
     }
     
@@ -445,8 +454,14 @@ class BST {
     void AVLremove(int key){
         ArrayList<Node> nodes = new ArrayList<>();
         AVLremove(key, nodes);
-        for (int i = nodes.size()-1; i>0; i--){
-            balanceTree(nodes.get(i), nodes.get(i-1));
+        for (int i = nodes.size()-1; i>=0; i--){
+            Node parent;
+            if (i>0){
+                parent = nodes.get(i-1);
+            } else {
+                parent = null;
+            }
+            balanceTree(nodes.get(i), parent);
         }
     }
 
